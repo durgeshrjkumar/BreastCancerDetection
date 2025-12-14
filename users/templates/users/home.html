@@ -1,0 +1,73 @@
+{% extends "users/base.html" %}
+
+{% block title %} Home Page {% endblock title %}
+
+{% block content %}
+<div class="jumbotron p-4">
+    <h1 class="display-5">
+        Welcome, {{ user.first_name|title|default:"Guest" }}
+    </h1>
+
+    <p class="lead">
+        This is a <b>Breast Cancer Detection System</b> built using
+        <b>Django</b> and a <b>CNN deep learning model</b>.
+    </p>
+
+    <hr class="my-4">
+
+    {% if user.is_authenticated %}
+
+        <h4 class="mb-3">Upload Histopathology Image</h4>
+
+        <form method="POST"
+              enctype="multipart/form-data"
+              action="{% url 'predict' %}"
+              class="mb-4">
+
+            {% csrf_token %}
+
+            <div class="form-group mb-3">
+                <input type="file"
+                       name="image"
+                       accept="image/*"
+                       class="form-control"
+                       required>
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                Predict Cancer
+            </button>
+        </form>
+
+        {% if result %}
+            {% if result == "Cancer Detected" %}
+                <div class="alert alert-danger">
+                    <h5 class="mb-1">Prediction Result</h5>
+                    <strong>{{ result }}</strong><br>
+                    Confidence: {{ confidence }}%
+                </div>
+            {% else %}
+                <div class="alert alert-success">
+                    <h5 class="mb-1">Prediction Result</h5>
+                    <strong>{{ result }}</strong><br>
+                    Confidence: {{ confidence }}%
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <small class="text-muted">
+            ⚠️ For educational purposes only. Not a medical diagnosis.
+        </small>
+
+    {% else %}
+        <p class="lead">
+            Please sign in to upload an image and get predictions.
+        </p>
+        <a class="btn btn-primary btn-lg"
+           href="{% url 'login' %}"
+           role="button">
+            Sign In
+        </a>
+    {% endif %}
+</div>
+{% endblock content %}
