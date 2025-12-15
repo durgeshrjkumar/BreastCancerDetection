@@ -10,16 +10,25 @@ from .forms import RegisterForm, LoginForm, UpdateUserForm, UpdateProfileForm
 import os
 import numpy as np
 from PIL import Image
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 from django.conf import settings
-MODEL_PATH = os.path.join(settings.BASE_DIR, "model", "breast_cancer_cnn.keras")
-
+# MODEL_PATH = os.path.join(settings.BASE_DIR, "model", "breast_cancer_cnn.keras")
+MODEL_PATH = os.path.join(settings.BASE_DIR, "model", "breast_idc_efficientnet.keras")
+IMG_SIZE = 128
 model = load_model(MODEL_PATH)
+# def preprocess_image(image_file):
+#     img = Image.open(image_file).convert("RGB")
+#     img = img.resize((IMG_SIZE, IMG_SIZE))
+#     img = np.array(img) / 255.0
+#     img = np.expand_dims(img, axis=0)  # (1, 50, 50, 3)
+#     return img
 def preprocess_image(image_file):
     img = Image.open(image_file).convert("RGB")
-    img = img.resize((50, 50))
-    img = np.array(img) / 255.0
-    img = np.expand_dims(img, axis=0)  # (1, 50, 50, 3)
+    img = img.resize((128, 128))
+    img = np.array(img).astype(np.float32)
+    img = tf.keras.applications.efficientnet.preprocess_input(img)
+    img = np.expand_dims(img, axis=0)
     return img
 from django.shortcuts import render
 
